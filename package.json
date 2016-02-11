@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/thejoshwolfe/yauzl",
   "dependencies": {
-    "fd-slicer": "~1.0.1"
+    "fd-slicer": "https://github.com/Darkneon/node-fd-slicer.git"
   },
   "devDependencies": {
     "bl": "~1.0.0",

@@ -173,6 +173,8 @@ function ZipFile(reader, centralDirectoryOffset, fileSize, entryCount, comment, 
   var self = this;
   EventEmitter.call(self);
   self.reader = reader;
+  self.individualFileReaders = [];
+  
   // forward close events
   self.reader.on("error", function(err) {
     // error closing the fd
@@ -197,6 +199,30 @@ ZipFile.prototype.close = function() {
   if (!this.isOpen) return;
   this.isOpen = false;
   this.reader.unref();
+};
+
+ZipFile.prototype.forceClose = function() {
+    if (this.reader.fd && this.reader.refCount > 0) {                        
+
+        this.reader.destroyed = true;
+        this.reader.pend.waiting = [];
+        this.reader.pend.max = 0;
+        this.reader.pend.pending = 0;
+                    
+        this.isOpen = false;
+        
+        for (var i = 0;i != this.individualFileReaders.length; i++) {                                        
+            var context = this.individualFileReaders[i].context;                
+            if (context) {
+                context.pend.waiting = [];
+                context.pend.max = 0;
+                context.pend.pending = 0;
+            }
+        }
+
+        fs.closeSync(this.reader.fd);
+        this.reader.fd = null;        
+    }
 };
 
 function emitErrorAndAutoClose(self, err) {
@@ -436,6 +462,7 @@ ZipFile.prototype.openReadStream = function(entry, callback) {
         };
         endpointStream = readStream.pipe(inflateFilter).pipe(checkerStream);
       }
+      self.individualFileReaders.push(readStream);
       callback(null, endpointStream);
     } finally {
       self.reader.unref();
