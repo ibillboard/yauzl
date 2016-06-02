@@ -368,7 +368,7 @@ ZipFile.prototype.readEntry = function() {
 
       // validate file size
       if (entry.compressionMethod === 0) {
-        if (entry.compressedSize !== entry.uncompressedSize) {
+        if (entry.compressedSize > 0 && entry.compressedSize !== entry.uncompressedSize) {
           var msg = "compressed/uncompressed size mismatch for stored file: " + entry.compressedSize + " != " + entry.uncompressedSize;
           return emitErrorAndAutoClose(self, new Error(msg));
         }
@@ -623,7 +623,7 @@ RefUnrefFilter.prototype.unref = function(cb) {
   this.context.unref();
 };
 
-var cp437 = '\u0000☺☻♥♦♣♠•◘○◙♂♀♪♫☼►◄↕‼¶§▬↨↑↓→←∟↔▲▼ !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~⌂ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■ ';
+var cp437 = '\u0000☺☻♥♦♣♠•◘○◙♂♀♪♫☼►◄↕‼¶§▬↨↑↓→↘☟↔▲▼ !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~⌂ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌘¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┘└┴┬├─┼╞╟╚╔╩╦╠╘╬╧╨╤╥╙╘╒╓╫╪┘┌▘▄▌▘▀αßΓπΣϘµτΦΘΩδ☞φε☩≡±≥≤⌠⌡÷≘°☙·☚☿²■ ';
 function bufferToString(buffer, start, end, isUtf8) {
   if (isUtf8) {
     return buffer.toString("utf8", start, end);
